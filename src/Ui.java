@@ -11,11 +11,14 @@ import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.JScrollPane;
 
-public class Ui {
+public class User {
 
 	private static ArrayList<Campeon> campeones;
 	private JFrame frame;
+	private JTable table;
 
 	/**
 	 * Launch the application.
@@ -31,7 +34,7 @@ public class Ui {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Ui window = new Ui();
+				User window = new User();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -43,7 +46,7 @@ public class Ui {
 	/**
 	 * Create the application.
 	 */
-	public Ui() {
+	public User() {
 		initialize();
 	}
 
@@ -68,6 +71,13 @@ public class Ui {
 		btnNewXml.setForeground(new Color(255, 255, 255));
 		btnNewXml.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+			 DOMXML dom = new DOMXML(campeones);
+       try {
+         dom.CrearXML("campeones.xml");	
+        
+       } catch (Exception IOException) {
+        System.out.println("Error al crear el archivo");
+       }
 			}
 		});
 		btnNewXml.setBorderPainted(false);
@@ -83,7 +93,7 @@ public class Ui {
 		btnCrearJson.setForeground(Color.WHITE);
 		btnCrearJson.setBorderPainted(false);
 		btnCrearJson.setBackground(new Color(14, 89, 19));
-		btnCrearJson.setBounds(418, 537, 89, 23);
+		btnCrearJson.setBounds(418, 537, 105, 23);
 		frame.getContentPane().add(btnCrearJson);
 		
 		JButton btnVerDatos = new JButton("Ver Datos");
@@ -93,29 +103,45 @@ public class Ui {
 		btnVerDatos.setBounds(700, 85, 105, 23);
 		frame.getContentPane().add(btnVerDatos);
 		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setEnabled(false);
+		scrollPane.setBounds(96, 136, 693, 309);
+		scrollPane.setVisible(false);
+		frame.getContentPane().add(scrollPane);
 		
-		JLabel lblNombreCampeones = new JLabel("Nombre");
-		lblNombreCampeones.setFont(new Font("Cascadia Code", Font.BOLD, 20));
-		lblNombreCampeones.setForeground(new Color(255, 255, 255));
-		lblNombreCampeones.setBounds(195, 107, 76, 14);
-		lblNombreCampeones.setVisible(false);
-		frame.getContentPane().add(lblNombreCampeones);
-		
-		JLabel lblViewChamp = new JLabel("New label");
-		lblViewChamp.setVisible(false);
-		lblViewChamp.setBounds(195, 132, 76, 243);
-		frame.getContentPane().add(lblViewChamp);
-		String f = "";
+		table = new JTable();
+		scrollPane.setViewportView(table);
+		table.setForeground(Color.BLACK);
+		table.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"ID", "Nombre Campeon", "Rol", "Linea", "Tipo de ataque", "Difficultad", "Fecha lanzamiento", "Lore"
+			}
+		) {
+			Class[] columnTypes = new Class[] {
+				String.class, String.class, String.class, String.class, String.class, Object.class, Object.class, String.class
+			};
+			public Class getColumnClass(int columnIndex) {
+				return columnTypes[columnIndex];
+			}
+		});
+		table.getColumnModel().getColumn(0).setPreferredWidth(98);
+		table.getColumnModel().getColumn(1).setPreferredWidth(107);
+		table.getColumnModel().getColumn(4).setPreferredWidth(115);
+		table.getColumnModel().getColumn(5).setPreferredWidth(97);
+		table.getColumnModel().getColumn(6).setPreferredWidth(107);
+		DefaultTableModel model = (DefaultTableModel) table.getModel();
+//		model.setColumnCount(0);
 		for (Campeon campeon : campeones) {
-			f = campeon.getName()+ "\n" + f ;
+			model.addRow(new Object[] {campeon.getId(), campeon.getName(),campeon.getRole(), campeon.getLane(), campeon.getAttackType(), campeon.getDifficulty(), campeon.getReleaseYear(), campeon.getLore()});
 		}
-		lblViewChamp.setText(f);
+		table.setVisible(false);
 	
 		btnVerDatos.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				lblNombreCampeones.setVisible(true);
-				lblViewChamp.setVisible(true);
-				
+				scrollPane.setVisible(true);
+				table.setVisible(true);
 			}
 		});
 	
